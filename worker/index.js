@@ -2,7 +2,7 @@
 var authConfig = {
   siteName: "Glory to Heaven",
   hybridpass: "Copy Hybrid Password Generated from Backend",
-  version: "8.2.7",
+  version: "8.2.8",
   theme: "black-netflix-red",
   // Following Themes are Available for Selection.
   // All are Lower Case - Do Not Enter Wrongly.
@@ -113,7 +113,7 @@ function html(current_drive_order = 0, model = {}) {
     })}');
     window.themeOptions = JSON.parse('${JSON.stringify(themeOptions)}');
     window.backend = '${authConfig.backendSite}';
-    window.version = '${authConfig.version}';
+    window.version = 'frontend-${authConfig.version}';
     window.gds = JSON.parse('${JSON.stringify(
       authConfig.roots.map((it) => it.name)
     )}');
@@ -285,7 +285,7 @@ async function handleRequest(request) {
       let email = url.searchParams.get("email");
       let sessionId = url.searchParams.get("sessionid");
       if(token && email && sessionId) {
-        let response = await gd.tokenAuthResponse(token, email, sessionId);
+        let response = await gd.tokenAuthResponse(token, sessionId, email);
         console.log(response);
         if(response) {
           const is_down = !(command && command == "down");
@@ -303,7 +303,7 @@ async function handleRequest(request) {
       let email = url.searchParams.get("email");
       let sessionId = url.searchParams.get("sessionid");
       if(token && email && sessionId) {
-        let response = await gd.tokenAuthResponse(token, email, sessionId);
+        let response = await gd.tokenAuthResponse(token, sessionId, email);
         console.log(response);
         if(response) {
           const is_down = !(command && command == "down");
@@ -321,7 +321,7 @@ async function handleRequest(request) {
       let email = url.searchParams.get("email");
       let sessionId = url.searchParams.get("sessionid");
       if(token && email && sessionId) {
-        let response = await gd.tokenAuthResponse(token, email, sessionId);
+        let response = await gd.tokenAuthResponse(token, sessionId, email);
         if(response) {
           const is_down = !(command && command == "down");
           return gd.down(file.id, range ,is_down);
@@ -528,6 +528,7 @@ class googleDrive {
           body: JSON.stringify({ email: received_user, password: received_pass })
         });
         const resbody = await res.json();
+        console.log(resbody);
         if(resbody.auth && resbody.registered && resbody.token){
           return null
         } else {
@@ -555,7 +556,6 @@ class googleDrive {
         body: JSON.stringify({ token: token, email: email, sessionId: sessionId })
       });
       const resbody = await res.json();
-      console.log(resbody);
       if(resbody.auth && resbody.registered && resbody.tokenuser){
         return true
       } else {
